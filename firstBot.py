@@ -1,66 +1,57 @@
 '''
-IRC bot made for the #studypython channel
-Current contributors: 
-- fnurk
-- fweakout
+fork of fweakout's bot
+keepin' it real, yo
 '''
 
 import socket
+from bot_config import *
 
-network = 'irc.freenode.net'
-channel = '#studypython'
-nick = 'StudyBot'
-
-chan_msg = "PRIVMSG %s :" %channel
+chanMsg = "PRIVMSG %s :" %channel
 
 alive = True
 
-def ping(): 
+def ping():
     irc.send("PONG :Pong\n")
 
-def join_chan(chan):
+def joinChan(chan):
     irc.send("JOIN %s\n" %chan)
 
-def send_msg(msg):
+def sendMsg(msg):
     irc.send("PRIVMSG %s :%s\n" %channel,msg)
 
 irc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 irc.connect((network,6667))
-irc.send("USER %s %s %s :fweakout bot\n" %(nick,nick,nick))
+irc.send("USER %s %s %s :salty bot\n" %(nick,nick,nick))
 irc.send("NICK %s\n" %nick)
 
-join_chan(channel)
+joinChan(channel)
+
+banana_count = 0
 
 while alive:
-    irc_msg = irc.recv(2048)
-    irc_msg = irc_msg.strip('\n\r')
-    print irc_msg
+    ircmsg = irc.recv(2048)
+    ircmsg = ircmsg.strip('\n\r')
+    print ircmsg
 
-    if irc_msg.find(":Hello "+nick) != -1:
-        irc.send(chan_msg+"Hello!\n")
+    if ircmsg.find(":Hello "+nick) != -1:
+        irc.send(chanMsg+"Hello!\n")
 
-    if irc_msg == ":!git":
-        irc.send(chan_msg+"https://github.com/fnurk/studypython \n")
-
-    if irc_msg == "!g+":
-        irc.send(chan_msg+"https://plus.google.com/communities/116969234888661099943 \n")
-
-    if irc_msg == ":!curr":
-        irc.send(chan_msg+"https://moot.it/learnpython \n")
+    if ":!banan" in ircmsg:
+        if (banana_count == 3):
+            banana_count = 0
+            irc.send(chanMsg+"Banana phone! https://www.youtube.com/watch?v=OpjGxq5uE3A \n")
+        else:
+            banana_count += 1
+            irc.send(chanMsg+"ring ring ring ring ring ring ring \n")
     
-    if irc_msg == ":!dog":
-        irc.send(chan_msg+"Woof woof woof WOOF! \n")
+    if ":!dog" in ircmsg:
+        irc.send(chanMsg+"Woof woof woof WOOF! \n")
 
-    if irc_msg == ":!help":
-        irc.send(chan_msg+"My commands are: !git, !g+, !curr, !lib, !dog and !help \n")
+    if ":!help" in ircmsg:
+        irc.send(chanMsg+"My commands are: !banan \n")
 
-    if irc_msg == (":!die "+nick):
+    if (":!die "+nick) in ircmsg:
         alive = False
 
-    if irc_msg == ":!wut":
-        irc.send(chan_msg+"tecn1c0 doesn't understand \n")
-    if irc_msg == "!lib":
-        irc.send(chan_msg+"http://www.lfd.uci.edu/~gohlke/pythonlibs/ \n")
-
-    if irc_msg.find("PING :") != -1:
+    if ircmsg.find("PING :") != -1:
         ping()
